@@ -18,6 +18,7 @@ https://www.jetbrains.com/help/idea/plugin-overview.html
 ***Instalar Postman para poder correr servicios***
 https://www.postman.com/
 
+Descargue los archivos que se encuentran en este repositorio y ubíquelos en una ruta local.
 
 ***Pasos para ejecutar el demo:***
 En una ventana de CMD navegar hasta la carpeta que contiene los archivos Login_service.py y Login_logic.py

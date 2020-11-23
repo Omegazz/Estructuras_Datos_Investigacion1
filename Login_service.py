@@ -1,15 +1,33 @@
-"""This script is to create [bot_id] bot service"""
+"""
+Universidad Cenfotec
+Estructuras de Datos 2
+Investifación 1: Algoritmos de Encriptación Web
+Profesor: Christian Sibaja
+Estudiantes:
+-Marypaz Araya
+-Roberto Fernandez
+-Diego Salas
+Año: 2020
+"""
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
-import json
 import sys
+import json
 # #################Remember to change the bot_id from the file name
-from Login_logic import LoginLogic
+from Login_logic import create, login, diccionario
 
-class LoginBcrypt(BaseHTTPRequestHandler):
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    """Class to create"""
+    def do_GET(self):
+        # pylint: disable=invalid-name
+        """Method to know if the service is running"""
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'Service running successfully')
     """Method to Login"""
-    def do_POST(self):
+
+    def do_create_POST(self, type):
         # pylint: disable=invalid-name
         """Method to purchase and download documents"""
         content_length = int(self.headers['Content-Length'])
@@ -17,40 +35,20 @@ class LoginBcrypt(BaseHTTPRequestHandler):
         data = json.loads(body)
         username = data['username']
         password = data['password']
-        
-        LoginProcess = LoginLogic(username, password)
-        return LoginProcess.results
-
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    """Class to create"""
-
-    def do_GET(self):
-        # pylint: disable=invalid-name
-        """Method to know if the service is running"""
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b'Service running successfully')
+        return create(username, password) if type else login(username, password)
 
     def do_POST(self):
         # pylint: disable=invalid-name
         """Method to run BIS107 selenium logic"""
+        response = BytesIO()
         response_data = None
-        if self.path == '/loginbcrypt':
-            results = LoginBcrypt.do_POST(self)
-            response_data = results
+        message = "La operación no se pudo completar"
+        if self.do_create_POST(self.path == '/createbcrypt'):
+            message = json.dumps(diccionario, sort_keys=True, indent=4, separators=(',', ': '))
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
-        # Everything that we return must be a bytes
-        # so make sure to parse everything to bytes
-        # using the "b" before a string or encoding it
-        # into utf8 as below:
-        response = BytesIO()
-        if response_data.process_log_file_path is not None:
-            response.write(str(response_data.process_log_file_path).encode("utf-8"))
-        else:
-            response.write(b'An exception has ocurred while running the bot')
-        self.wfile.write(response.getvalue())
+        self.wfile.write(str.encode(message))
 
 PORT = int(sys.argv[1])
 HTTPD = HTTPServer(('localhost', PORT), SimpleHTTPRequestHandler)
